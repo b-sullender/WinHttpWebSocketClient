@@ -4,7 +4,7 @@ Windows C++ WebSocket Client implemented using the WinHTTP functions.
 You do not need to compile anything to use this WebSocket client in your application, just include **`websocket.cpp`** and **`websocket.h`** in your application.
 Everything is contained in the WinHttpWebSocketClient namespace.
 
-Check example.cpp for a detailed example.
+Check **`example.cpp`** for a detailed example.
 
 ## Functions
 

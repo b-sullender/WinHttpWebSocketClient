@@ -4,5 +4,5 @@
 
 Closes the connection.
 
-**Return Value**
+**Return Value**  
 N/A

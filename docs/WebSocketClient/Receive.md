@@ -17,4 +17,4 @@ A pointer to a variable to receive the number of bytes read.
 Pointer to a varible of type **`WINHTTP_WEB_SOCKET_BUFFER_TYPE`** to receive the type of data received.
 
 **Return Value**  
-NO_ERROR on success, otherwise an error code.
+**`NO_ERROR`** on success, otherwise an error code.

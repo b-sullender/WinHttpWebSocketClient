@@ -11,4 +11,4 @@ The host name (URL address) and port number. You must specify a scheme in the UR
 This parameter is not currently used. You should pass 0 (zero).
 
 **Return Value**  
-NO_ERROR on success, otherwise an error code.
+**`NO_ERROR`** on success, otherwise an error code.

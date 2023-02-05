@@ -19,4 +19,4 @@ Pointer to the data to send.
 The number of bytes to send.
 
 **Return Value**  
-NO_ERROR on success, otherwise an error code.
+**`NO_ERROR`** on success, otherwise an error code.

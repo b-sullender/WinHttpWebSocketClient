@@ -4,17 +4,17 @@
 
 Print an error code to a string with a description. Some codes are replaced with a C++ definition.
 
-***errorCode***:
+***errorCode***  
 The error code to print. For example, the value returned from the **`GetLastError()`** function.
 
-***des***:
+***des***  
 The destination of the error string.
 
-***action***
+***action***  
 The function or action that caused the error. This is the start of the error string.
 
-***append***
+***append***  
 If this is true the error string gets appended to the destination ***des*** string. This parameter is optional, the default is false.
 
-**Return Value**
+**Return Value**  
 N/A

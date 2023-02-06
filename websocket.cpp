@@ -227,8 +227,20 @@ DWORD WebSocketClient::Initialize(HINTERNET hSession, PCCERT_CONTEXT pCertContex
 	return this->ErrorCode;
 }
 
-void WebSocketClient::Close()
+DWORD WebSocketClient::Close(CHAR* reason)
 {
+	// Length of reason in bytes
+	DWORD reasonLen;
+	if (reason == NULL) {
+		reasonLen = 0;
+	}
+	else {
+		reasonLen = (DWORD)strlen(reason);
+	}
+
+	// Gracefully close the connection
+	this->ErrorCode = WinHttpWebSocketClose(this->hWebSocket, WINHTTP_WEB_SOCKET_SUCCESS_CLOSE_STATUS, reason, reasonLen);
+
 	// Close the connection handles
 	WinHttpCloseHandle(this->hWebSocket);
 	WinHttpCloseHandle(this->hRequest);
@@ -238,9 +250,12 @@ void WebSocketClient::Close()
 	this->hWebSocket = NULL;
 	this->hRequest = NULL;
 	this->hConnect = NULL;
+
+	// Return error code
+	return this->ErrorCode;
 }
 
-DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
+DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 {
 	// Return 0 for success
 	DWORD errorCode = ERROR_SUCCESS;
@@ -251,6 +266,9 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
 	// Create cracked URL buffer variables
 	WCHAR* hostName = NULL;
 	WCHAR* urlPath = NULL;
+
+	// Sec-WebSocket-Protocol header string buffer
+	WCHAR* websocket_protocol = NULL;
 
 	// Option variables for WinHttpSetOption
 	void* ptrOptionValue;
@@ -313,8 +331,13 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
 		goto errorExit;
 	}
 
+	DWORD dwFlags = 0;
+	if (flags & WEBSOCKET_SECURE_CONNECTION) {
+		dwFlags |= WINHTTP_FLAG_SECURE;
+	}
+
 	// Create a HTTP request
-	this->hRequest = WinHttpOpenRequest(this->hConnect, L"GET", urlPath, NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
+	this->hRequest = WinHttpOpenRequest(this->hConnect, L"GET", urlPath, NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, dwFlags);
 	if (!this->hRequest)
 	{
 		// Handle error
@@ -373,7 +396,27 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
 		goto errorExit;
 	}
 
-	// Send the request.
+	if (protocol != NULL)
+	{
+		// Allocate temporary memory for header string
+		size_t headerLen = wcslen(protocol) + 0x100;
+		websocket_protocol = (WCHAR*)malloc(sizeof(WCHAR) * headerLen);
+
+		// Handle error
+		if (websocket_protocol == NULL) {
+			errorCode = ERROR_NOT_ENOUGH_MEMORY;
+			PrintLastError(errorCode, this->ErrorDescription, this->ErrorBufferLength, L"Allocating memory for request header", true);
+			goto errorExit;
+		}
+
+		// Build the "Sec-WebSocket-Protocol" header
+		swprintf_s(websocket_protocol, headerLen, L"%ls %ls", L"Sec-WebSocket-Protocol:", protocol);
+
+		// Add to the request handle
+		WinHttpAddRequestHeaders(this->hRequest, websocket_protocol, -1L, WINHTTP_ADDREQ_FLAG_ADD);
+	}
+
+	// Send the WebSocket upgrade request.
 	if (!WinHttpSendRequest(this->hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, 0, 0, 0, 0))
 	{
 		// Handle error
@@ -382,6 +425,7 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
 		goto errorExit;
 	}
 
+	// Receive response from the server
 	if (!WinHttpReceiveResponse(this->hRequest, 0))
 	{
 		// Handle error
@@ -403,6 +447,7 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags)
 	// Free resources
 	if (hostName) free(hostName);
 	if (urlPath) free(urlPath);
+	if (websocket_protocol) free(websocket_protocol);
 
 	// Set error code
 	this->ErrorCode = errorCode;
@@ -420,6 +465,7 @@ errorExit:
 	// Free resources
 	if (hostName) free(hostName);
 	if (urlPath) free(urlPath);
+	if (websocket_protocol) free(websocket_protocol);
 
 	// Set error code
 	this->ErrorCode = errorCode;

@@ -13,6 +13,12 @@
 #include <Windows.h>
 #include <winhttp.h>
 
+// Connect flags
+
+#define WEBSOCKET_SECURE_CONNECTION        0x0001
+
+// WebSocket client class
+
 namespace WinHttpWebSocketClient
 {
 	// Helper functions
@@ -48,12 +54,12 @@ namespace WinHttpWebSocketClient
 		// Initialize the WebSocket client class
 		DWORD Initialize(HINTERNET hSession, PCCERT_CONTEXT pCertContext);
 		// Connect to a WebSocket server
-		DWORD Connect(WCHAR* host, DWORD flags);
+		DWORD Connect(WCHAR* host, DWORD flags, WCHAR* protocol = NULL);
 		// Receive data from the WebSocket server
 		DWORD Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesRead, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType);
 		// Send data to the WebSocket server
 		DWORD Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwBufferLength);
 		// Close the connection to the server
-		void Close();
+		DWORD Close(CHAR* reason = NULL);
 	};
 }

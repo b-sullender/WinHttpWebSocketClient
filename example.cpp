@@ -67,7 +67,7 @@ int wmain()
 
 	// Attempt to connect to the WebSocket server
 	// NOTE: WinHTTP does not support "ws" or "wss" schemes in the URL, we can use "http" or "https" without issues
-	if (webSocket.Connect(L"https://sullewarehouse.com:41000", 0) != NO_ERROR)
+	if (webSocket.Connect(L"https://sullewarehouse.com:41000", WEBSOCKET_SECURE_CONNECTION) != NO_ERROR)
 	{
 		wprintf(L"%ls\n", webSocket.ErrorDescription);
 		if (webSocket.ErrorCode == 0x2F9A) {
@@ -113,9 +113,14 @@ int wmain()
 		printf("%s %s\n", "Received:", msgBuffer);
 	}
 
-	// Close connection
+	// Close the WebSocket connection
 	wprintf(L"%ls", L"Closing connection\n");
-	webSocket.Close();
+
+	if (webSocket.Close() != NO_ERROR)
+	{
+		PrintLastError(webSocket.ErrorCode, buffer, bufferLength, L"WebSocket.Close()");
+		wprintf(L"%ls\n", buffer);
+	}
 
 exit:
 

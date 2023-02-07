@@ -4,7 +4,7 @@
 
 Closes the WebSocket connection.
 
-***reason***
+***reason***  
 The reason for closing the connection. This parameter is optional.
 
 **Return Value**  

@@ -264,6 +264,7 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 	URL_COMPONENTS UrlComponents;
 
 	// Create cracked URL buffer variables
+	WCHAR* scheme = NULL;
 	WCHAR* hostName = NULL;
 	WCHAR* urlPath = NULL;
 
@@ -274,6 +275,14 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 	void* ptrOptionValue;
 
 	// Allocate buffers
+
+	// Max of 32 characters
+	scheme = (WCHAR*)malloc(sizeof(WCHAR) * 0x20);
+	if (scheme == NULL) {
+		errorCode = ERROR_NOT_ENOUGH_MEMORY;
+		PrintLastError(errorCode, this->ErrorDescription, this->ErrorBufferLength, L"WebSocketClient::Connect()");
+		goto errorExit;
+	}
 	// Max of 256 characters
 	hostName = (WCHAR*)malloc(sizeof(WCHAR) * 0x100);
 	if (hostName == NULL) {
@@ -318,8 +327,23 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 	}
 
 	// Copy cracked URL hostName & UrlPath to buffers so they are separated
+	wcsncpy_s(scheme, 0x20, UrlComponents.lpszScheme, UrlComponents.dwSchemeLength);
 	wcsncpy_s(hostName, 0x100, UrlComponents.lpszHostName, UrlComponents.dwHostNameLength);
 	wcsncpy_s(urlPath, 0x1000, UrlComponents.lpszUrlPath, UrlComponents.dwUrlPathLength);
+
+	if (UrlComponents.nPort == 0) {
+		if ((wcsicmp(scheme, L"wss") == 0) || (wcsicmp(scheme, L"https") == 0)) {
+			UrlComponents.nPort = INTERNET_DEFAULT_HTTPS_PORT;
+		}
+		else if ((wcsicmp(scheme, L"ws") == 0) || (wcsicmp(scheme, L"http")) == 0) {
+			UrlComponents.nPort = INTERNET_DEFAULT_HTTP_PORT;
+		}
+		else {
+			errorCode = ERROR_INVALID_PARAMETER;
+			PrintLastError(errorCode, this->ErrorDescription, this->ErrorBufferLength, L"WebSocketClient::Connect()", true);
+			goto errorExit;
+		}
+	}
 
 	// Call the WinHttp Connect method
 	this->hConnect = WinHttpConnect(this->hSession, hostName, UrlComponents.nPort, 0);
@@ -445,6 +469,7 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 	}
 
 	// Free resources
+	if (scheme) free(scheme);
 	if (hostName) free(hostName);
 	if (urlPath) free(urlPath);
 	if (websocket_protocol) free(websocket_protocol);
@@ -463,6 +488,7 @@ errorExit:
 	if (this->hConnect) WinHttpCloseHandle(this->hConnect);
 
 	// Free resources
+	if (scheme) free(scheme);
 	if (hostName) free(hostName);
 	if (urlPath) free(urlPath);
 	if (websocket_protocol) free(websocket_protocol);

@@ -12,3 +12,6 @@ A handle to a certificate to be used for making secure communication. If you do 
 
 **Return Value**  
 **`NO_ERROR`** on success, otherwise an error code.
+
+**Remarks**  
+If the call was successful, you must call [Free](docs/WebSocketClient/Free.md) when you are done using the class to free system resources.

@@ -10,6 +10,9 @@
 //     The header file for the WinHttpWebSocketClient namespace.
 //
 
+#ifndef WINHTTP_WEB_SOCKET_CLIENT_H
+#define WINHTTP_WEB_SOCKET_CLIENT_H
+
 #include <Windows.h>
 #include <winhttp.h>
 
@@ -58,8 +61,14 @@ namespace WinHttpWebSocketClient
 		// Receive data from the WebSocket server
 		DWORD Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesRead, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType);
 		// Send data to the WebSocket server
-		DWORD Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwBufferLength);
+		DWORD Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwLength);
 		// Close the connection to the server
-		DWORD Close(CHAR* reason = NULL);
+		DWORD Close(WINHTTP_WEB_SOCKET_CLOSE_STATUS status, CHAR* reason = NULL);
+		// Retrieve the close status sent by a server
+		DWORD QueryCloseStatus(USHORT* pusStatus, PVOID pvReason, DWORD dwReasonLength, DWORD* pdwReasonLengthConsumed);
+		// Free resources
+		VOID Free();
 	};
 }
+
+#endif // !WINHTTP_WEB_SOCKET_CLIENT_H

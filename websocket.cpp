@@ -227,7 +227,18 @@ DWORD WebSocketClient::Initialize(HINTERNET hSession, PCCERT_CONTEXT pCertContex
 	return this->ErrorCode;
 }
 
-DWORD WebSocketClient::Close(CHAR* reason)
+VOID WebSocketClient::Free()
+{
+	// Free resources
+	if (this->ErrorDescription) {
+		free(this->ErrorDescription);
+	}
+
+	// Set class data to zero
+	memset(this, 0, sizeof(WebSocketClient));
+}
+
+DWORD WebSocketClient::Close(WINHTTP_WEB_SOCKET_CLOSE_STATUS status, CHAR* reason)
 {
 	// Length of reason in bytes
 	DWORD reasonLen;
@@ -239,7 +250,7 @@ DWORD WebSocketClient::Close(CHAR* reason)
 	}
 
 	// Gracefully close the connection
-	this->ErrorCode = WinHttpWebSocketClose(this->hWebSocket, WINHTTP_WEB_SOCKET_SUCCESS_CLOSE_STATUS, reason, reasonLen);
+	this->ErrorCode = WinHttpWebSocketClose(this->hWebSocket, status, reason, reasonLen);
 
 	// Close the connection handles
 	WinHttpCloseHandle(this->hWebSocket);
@@ -332,10 +343,10 @@ DWORD WebSocketClient::Connect(WCHAR* host, DWORD flags, WCHAR* protocol)
 	wcsncpy_s(urlPath, 0x1000, UrlComponents.lpszUrlPath, UrlComponents.dwUrlPathLength);
 
 	if (UrlComponents.nPort == 0) {
-		if ((wcsicmp(scheme, L"wss") == 0) || (wcsicmp(scheme, L"https") == 0)) {
+		if ((_wcsicmp(scheme, L"wss") == 0) || (_wcsicmp(scheme, L"https") == 0)) {
 			UrlComponents.nPort = INTERNET_DEFAULT_HTTPS_PORT;
 		}
-		else if ((wcsicmp(scheme, L"ws") == 0) || (wcsicmp(scheme, L"http")) == 0) {
+		else if ((_wcsicmp(scheme, L"ws") == 0) || (_wcsicmp(scheme, L"http")) == 0) {
 			UrlComponents.nPort = INTERNET_DEFAULT_HTTP_PORT;
 		}
 		else {
@@ -509,10 +520,19 @@ DWORD WebSocketClient::Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBy
 	return this->ErrorCode;
 }
 
-DWORD WebSocketClient::Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwBufferLength)
+DWORD WebSocketClient::Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwLength)
 {
 	// Send the data to the server
-	this->ErrorCode = WinHttpWebSocketSend(this->hWebSocket, bufferType, pBuffer, dwBufferLength);
+	this->ErrorCode = WinHttpWebSocketSend(this->hWebSocket, bufferType, pBuffer, dwLength);
+
+	// Return error code
+	return this->ErrorCode;
+}
+
+DWORD WebSocketClient::QueryCloseStatus(USHORT* pusStatus, PVOID pvReason, DWORD dwReasonLength, DWORD* pdwReasonLengthConsumed)
+{
+	// Query the close status
+	this->ErrorCode = WinHttpWebSocketQueryCloseStatus(this->hWebSocket, pusStatus, pvReason, dwReasonLength, pdwReasonLengthConsumed);
 
 	// Return error code
 	return this->ErrorCode;

@@ -21,5 +21,4 @@ The number of bytes consumed. If **`pvReason`** is NULL and **`dwReasonLength`**
 
 **Remarks**  
 Call **`QueryCloseStatus`** only after **`Close`** succeeds or if **`Receive`** returns **`WINHTTP_WEB_SOCKET_CLOSE_BUFFER_TYPE`**.
-
 **`pdwReasonLengthConsumed`** will never be greater than 123, so allocating buffer with at least 123 will guarantee that **`ERROR_INSUFFICIENT_BUFFER`** will never be returned.

@@ -6,8 +6,6 @@ Everything is contained in the **`WinHttpWebSocketClient`** namespace.
 
 Check **`example.cpp`** for a detailed example.
 
-A WebSocket server has been implemented
-
 ## Functions
 
 - [PrintLastError](docs/PrintLastError.md)
@@ -33,4 +31,4 @@ Members:
 
 ## WebSocket resources
 
-- [WebSocket server for IIS](https://github.com/sullewarehouse/iiswebsocketserver)
+- [WebSocket server for Microsoft IIS](https://github.com/sullewarehouse/iiswebsocketserver)

@@ -2,7 +2,7 @@
 
 **Initialize(hSession, pCertContext)**
 
-Initializes the WebSocket class.
+Initializes the WebSocketClient class.
 
 ***hSession***  
 A session handle opened by a call to **WinHttpOpen()** function. The session should be opened in synchronous mode for compatibility with future versions of this class.

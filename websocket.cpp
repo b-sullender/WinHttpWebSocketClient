@@ -511,10 +511,10 @@ errorExit:
 	return errorCode;
 }
 
-DWORD WebSocketClient::Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesRead, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType)
+DWORD WebSocketClient::Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesReceived, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType)
 {
 	// Read data from the server
-	this->ErrorCode = WinHttpWebSocketReceive(this->hWebSocket, pBuffer, dwBufferLength, pdwBytesRead, pBufferType);
+	this->ErrorCode = WinHttpWebSocketReceive(this->hWebSocket, pBuffer, dwBufferLength, pdwBytesReceived, pBufferType);
 
 	// Return error code
 	return this->ErrorCode;

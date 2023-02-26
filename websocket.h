@@ -20,12 +20,9 @@
 
 #define WEBSOCKET_SECURE_CONNECTION        0x0001
 
-// WebSocket client class
-
+// WinHTTP WebSocket client namespace
 namespace WinHttpWebSocketClient
 {
-	// Helper functions
-
 	// Print a Windows Error Code
 	void PrintLastError(DWORD errorCode, WCHAR* des, size_t desLen, WCHAR* action, bool append = false);
 
@@ -33,8 +30,7 @@ namespace WinHttpWebSocketClient
 	// - If store is NULL then the function searches "My" and "WebHosting" stores
 	PCCERT_CONTEXT OpenCertificateByName(WCHAR* subjectName, WCHAR* store, bool userStores);
 
-	// The main WebSocket client class
-
+	// WebSocket client class
 	class WebSocketClient {
 	private:
 		// Application session handle to use with this connection
@@ -59,7 +55,7 @@ namespace WinHttpWebSocketClient
 		// Connect to a WebSocket server
 		DWORD Connect(WCHAR* host, DWORD flags, WCHAR* protocol = NULL);
 		// Receive data from the WebSocket server
-		DWORD Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesRead, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType);
+		DWORD Receive(void* pBuffer, DWORD dwBufferLength, DWORD* pdwBytesReceived, WINHTTP_WEB_SOCKET_BUFFER_TYPE* pBufferType);
 		// Send data to the WebSocket server
 		DWORD Send(WINHTTP_WEB_SOCKET_BUFFER_TYPE bufferType, void* pBuffer, DWORD dwLength);
 		// Close the connection to the server

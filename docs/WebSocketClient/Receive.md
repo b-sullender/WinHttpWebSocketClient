@@ -1,8 +1,8 @@
 # WebSocketClient.Receive
 
-**Receive(pBuffer, dwBufferLength, pdwBytesRead, pBufferType)**
+**Receive(pBuffer, dwBufferLength, pdwBytesReceived, pBufferType)**
 
-Reads data from the WebSocket server. This function blocks until data is received.
+Receives data from the WebSocket server. This function blocks until data is received.
 
 ***pBuffer***  
 A pointer to the destination buffer.
@@ -10,7 +10,7 @@ A pointer to the destination buffer.
 ***dwBufferLength***  
 The length of the destination buffer in bytes.
 
-***pdwBytesRead***  
+***pdwBytesReceived***  
 A pointer to a variable to receive the number of bytes read.
 
 ***pBufferType***  
